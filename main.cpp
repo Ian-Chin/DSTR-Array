@@ -8,6 +8,8 @@
 #include "ageGroupAnalysis.hpp"
 #include "billingAnalysis.hpp"
 #include "careTypeAnalysis.hpp"
+#include "Sortinganalysis.hpp"
+#include "Searchanalysis.hpp"
 
 using namespace std;
 
@@ -25,7 +27,9 @@ void displayMenu() {
     cout << "6. Age group analysis\n";
     cout << "7. Total bill cost\n";
     cout << "8. Dataset Summary\n";
-    cout << "9. Exit\n";
+    cout << "9. Sorting Analysis (insertion & merge sort)\n";
+    cout << "10. Searching Analysis (linear & binary search)\n";
+    cout << "11. Exit\n";
     cout << "================================================\n";
     cout << "Enter your choice: ";
 }
@@ -180,7 +184,7 @@ int main() {
         
         // Fix for invalid input (e.g. typing letters like 'd')
         if (!(cin >> choice)) {
-            cout << "\nInvalid input. Please enter a number between 1 and 9.\n";
+            cout << "\nInvalid input. Please enter a number between 1 and 11.\n";
             cin.clear();            // Clear error state
             cin.ignore(10000, '\n'); // Discard bad input from buffer
             continue;               // Jump back to start of loop (menu)
@@ -189,7 +193,7 @@ int main() {
         Patient facilityA[MAX_PATIENTS], facilityB[MAX_PATIENTS], facilityC[MAX_PATIENTS];
         int countA = 0, countB = 0, countC = 0;
 
-        if (choice >= 5 && choice <= 8) {
+        if (choice >= 5 && choice <= 10) {
             bool okA = loadDataset("dataset/dataset1 facility_a.csv", facilityA, countA);
             bool okB = loadDataset("dataset/dataset2 facility_b.csv", facilityB, countB);
             bool okC = loadDataset("dataset/dataset3_facility_c.csv", facilityC, countC);
@@ -202,7 +206,7 @@ int main() {
 
         Patient combined[MAX_PATIENTS * 3];
         int combinedCount = 0;
-        if (choice >= 5 && choice <= 8) {
+        if (choice >= 5 && choice <= 10) {
             for (int i = 0; i < countA; i++) combined[combinedCount++] = facilityA[i];
             for (int i = 0; i < countB; i++) combined[combinedCount++] = facilityB[i];
             for (int i = 0; i < countC; i++) combined[combinedCount++] = facilityC[i];
@@ -247,13 +251,21 @@ int main() {
                 break;
 
             case 9:
+                sortingAnalysisMenu(facilityA, countA, facilityB, countB, facilityC, countC, combined, combinedCount);
+                break;
+
+            case 10:
+                searchAnalysisMenu(facilityA, countA, facilityB, countB, facilityC, countC, combined, combinedCount);
+                break;
+
+            case 11:
                 cout << "\nExiting Array implementation...\n";
                 break;
 
             default:
-                cout << "\nInvalid choice. Please enter a choice between 1 and 9.\n";
+                cout << "\nInvalid choice. Please enter a choice between 1 and 11.\n";
         }
-    } while (choice != 9);
+    } while (choice != 11);
 
     return 0;
 }
