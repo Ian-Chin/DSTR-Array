@@ -144,7 +144,7 @@ inline void sortingAnalysisMenu(const Patient facilityA[], int countA,
                                 const Patient facilityB[], int countB,
                                 const Patient facilityC[], int countC,
                                 const Patient combined[], int combinedCount) {
-    std::cout << "\n=== SORTING EXPERIMENT (ARRAY) ===\n";
+    std::cout << "\n=== SORTING (ARRAY) ===\n";
     runSortingExperiment(facilityA, countA, "FACILITY A");
     runSortingExperiment(facilityB, countB, "FACILITY B");
     runSortingExperiment(facilityC, countC, "FACILITY C");

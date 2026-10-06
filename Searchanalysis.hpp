@@ -1,13 +1,5 @@
 #ifndef SEARCH_ANALYSIS_HPP
 #define SEARCH_ANALYSIS_HPP
-
-// ===========================================================================
-// Step 7 - Searching experiment (array implementation)
-// Algorithms : linear search (unsorted data) and binary search (sorted data)
-// Queries    : Age 61-100 + Emergency, and Length of Stay > 24 hours
-// Measured   : comparisons, execution time, matches, extra memory
-// ===========================================================================
-
 #include <chrono>
 #include <iomanip>
 #include <iostream>
@@ -244,7 +236,7 @@ inline void searchAnalysisMenu(const Patient facilityA[], int countA,
                                const Patient facilityB[], int countB,
                                const Patient facilityC[], int countC,
                                const Patient combined[], int combinedCount) {
-    std::cout << "\n=== SEARCHING EXPERIMENT (ARRAY) ===\n";
+    std::cout << "\n=== SEARCHING (ARRAY) ===\n";
     runSearchExperiment(facilityA, countA, "FACILITY A");
     runSearchExperiment(facilityB, countB, "FACILITY B");
     runSearchExperiment(facilityC, countC, "FACILITY C");
