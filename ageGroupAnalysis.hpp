@@ -12,32 +12,21 @@ const int NUM_AGE_GROUPS = 5;
 
 inline std::string getAgeGroupName(int index) {
     switch (index) {
-        case 0: return "Pediatrics";
-        case 1: return "Young Adult";
-        case 2: return "Working Early";
-        case 3: return "Working Late";
-        case 4: return "Senior";
+        case 0: return "0-17 Pediatrics";
+        case 1: return "18-25 Young Adult";
+        case 2: return "26-45 Working Early";
+        case 3: return "46-60 Working Late";
+        case 4: return "61-100 Senior";
         default: return "Unknown";
     }
 }
 
-inline int getAgeGroupLabel(int index) {
-    switch (index) {
-        case 0: return 7;
-        case 1: return 25;
-        case 2: return 45;
-        case 3: return 60;
-        case 4: return 100;
-        default: return 0;
-    }
-}
-
 inline int getAgeGroupIndex(int age) {
-    if (age >= 0  && age <= 18) return 0;   // Pediatrics
-    if (age >= 19 && age <= 26) return 1;   // Young Adult
-    if (age >= 27 && age <= 45) return 2;   // Working Early
-    if (age >= 46 && age <= 60) return 3;   // Working Late
-    if (age >= 61)              return 4;   // Senior
+    if (age >= 0  && age <= 17)  return 0;   // 0-17 Pediatrics
+    if (age >= 18 && age <= 25)  return 1;   // 18-25 Young Adult
+    if (age >= 26 && age <= 45)  return 2;   // 26-45 Working Early
+    if (age >= 46 && age <= 60)  return 3;   // 46-60 Working Late
+    if (age >= 61)               return 4;   // 61-100 Senior
     return -1;
 }
 
@@ -120,11 +109,11 @@ inline void printAgeGroupReport(const Patient patients[], int count, const std::
     std::cout << "\n";
     std::cout << title << "  - by age group  (" << count << " patients)\n";
     std::cout << std::left
-              << std::setw(18) << "Group"
+              << std::setw(22) << "AgeGroup"
               << std::setw(10) << "Patients"
               << std::setw(8)  << "Share"
               << std::setw(8)  << "AvgAge"
-              << std::setw(20) << "TopCareType"
+              << std::setw(18) << "TopCareType"
               << std::setw(10) << "AvgStay"
               << std::setw(14) << "TotalCost(RM)"
               << std::setw(12) << "AvgCost(RM)"
@@ -140,31 +129,30 @@ inline void printAgeGroupReport(const Patient patients[], int count, const std::
         double avgStay = (s.count > 0) ? (s.sumStay / s.count) : 0.0;
         double avgCost = (s.count > 0) ? (s.totalCost / s.count) : 0.0;
 
-        std::string groupLabel = std::to_string(getAgeGroupLabel(i)) + " " + getAgeGroupName(i);
-
         std::ostringstream shareStr;
         shareStr << std::fixed << std::setprecision(1) << share << "%";
-        std::cout << std::left << std::setw(18) << groupLabel
+
+        std::cout << std::left << std::setw(22) << getAgeGroupName(i)
                   << std::setw(10) << s.count
                   << std::setw(8)  << shareStr.str()
                   << std::setprecision(1) << std::setw(8) << avgAge
-                  << std::setw(20) << getTopCareType(s)
+                  << std::setw(18) << getTopCareType(s)
                   << std::setw(10) << avgStay
                   << std::right << std::setw(13) << std::setprecision(2) << s.totalCost
-                  << "  " << std::left << std::setprecision(1) << avgCost
+                  << "  " << std::left << std::setprecision(2) << avgCost
                   << "\n";
     }
 
     std::cout << std::string(100, '-') << "\n";
     double overallAvgCost = (count > 0) ? (grandTotalCost / count) : 0.0;
-    std::cout << std::left << std::setw(18) << "ALL"
+    std::cout << std::left << std::setw(22) << "TOTAL"
               << std::setw(10) << count
               << std::setw(8)  << ""
               << std::setw(8)  << ""
-              << std::setw(20) << ""
+              << std::setw(18) << ""
               << std::setw(10) << ""
               << std::right << std::setw(13) << std::setprecision(2) << grandTotalCost
-              << "  " << std::left << std::setprecision(1) << overallAvgCost
+              << "  " << std::left << std::setprecision(2) << overallAvgCost
               << "\n";
     std::cout << "\n";
 }
