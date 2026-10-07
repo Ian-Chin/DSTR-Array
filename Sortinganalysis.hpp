@@ -19,13 +19,14 @@ inline bool byCostDesc(const Patient& a, const Patient& b) { return getMedicalCo
 inline double ageOf(const Patient& p)  { return p.age; }
 inline double stayOf(const Patient& p) { return p.lengthOfStay; }
 
+
 struct SortStats {
     std::string label;
     long   comparisons;
-    long   moves;        // kept for analysis, not printed
+    long   moves;
     double timeMs;
-    long   dataBytes;    // printed as Est.MemBytes (n * sizeof(Patient)), comparable to list size * sizeof(Node)
-    long   auxBytes;     // kept for analysis, not printed
+    long   dataBytes;
+    long   auxBytes;
 };
 
 inline void insertionSort(Patient arr[], int n, PatientLess less,
@@ -34,13 +35,13 @@ inline void insertionSort(Patient arr[], int n, PatientLess less,
     moves = 0;
 
     for (int i = 1; i < n; i++) {
-        Patient key = arr[i];
+        Patient key = arr[i];         
         int j = i - 1;
 
         while (j >= 0) {
             comparisons++;
-            if (!less(key, arr[j])) break;
-            arr[j + 1] = arr[j];
+            if (!less(key, arr[j])) break;  
+            arr[j + 1] = arr[j];            
             moves++;
             j--;
         }
@@ -80,7 +81,7 @@ inline void mergeSort(Patient arr[], int n, PatientLess less,
     moves = 0;
     if (n < 2) return;
 
-    Patient* temp = new Patient[n];
+    Patient* temp = new Patient[n];    
     mergeSortRange(arr, temp, 0, n - 1, less, comparisons, moves);
     delete[] temp;
 }
@@ -106,23 +107,26 @@ inline SortStats measureSort(const Patient original[], int n, PatientLess less,
     return s;
 }
 
-// Same layout as the linked-list printSortStatsTable
-inline void printSortTable(const SortStats stats[], int count) {
-    std::cout << std::endl;
-    std::cout << "Step 6 - Sorting performance (array)" << std::endl;
-    std::cout << std::left  << std::setw(24) << "Algorithm/SortKey";
-    std::cout << std::right << std::setw(14) << "Comparisons";
-    std::cout << std::right << std::setw(12) << "Time(ms)";
-    std::cout << std::right << std::setw(16) << "Est.MemBytes" << std::endl;
-    std::cout << std::string(66, '-') << std::endl;
+inline void printSortTable(const SortStats stats[], int count, const std::string& title, int n) {
+    std::cout << "\n" << title << " (" << n << " records)\n";
+    std::cout << std::left  << std::setw(24) << "Algorithm / Sort Key"
+              << std::right << std::setw(13) << "Comparisons"
+              << std::setw(10) << "Moves"
+              << std::setw(12) << "Time(ms)"
+              << std::setw(12) << "Data(B)"
+              << std::setw(13) << "ExtraMem(B)" << "\n";
+    std::cout << std::string(84, '-') << "\n";
     for (int i = 0; i < count; i++) {
-        std::cout << std::left  << std::setw(24) << stats[i].label;
-        std::cout << std::right << std::setw(14) << stats[i].comparisons;
-        std::cout << std::fixed << std::setprecision(4);
-        std::cout << std::right << std::setw(12) << stats[i].timeMs;
-        std::cout << std::right << std::setw(16) << stats[i].dataBytes << std::endl;
+        std::cout << std::left  << std::setw(24) << stats[i].label
+                  << std::right << std::setw(13) << stats[i].comparisons
+                  << std::setw(10) << stats[i].moves
+                  << std::fixed << std::setprecision(4)
+                  << std::setw(12) << stats[i].timeMs
+                  << std::setw(12) << stats[i].dataBytes
+                  << std::setw(13) << stats[i].auxBytes << "\n";
     }
 }
+
 
 inline void runSortingExperiment(const Patient patients[], int count, const std::string& title) {
     PatientLess rules[3] = { byAgeAsc, byStayAsc, byCostDesc };
@@ -133,11 +137,7 @@ inline void runSortingExperiment(const Patient patients[], int count, const std:
         stats[k]     = measureSort(patients, count, rules[k], "Merge / " + names[k], false);
         stats[k + 3] = measureSort(patients, count, rules[k], "Insertion / " + names[k], true);
     }
-
-    std::cout << "\n------------------------------------------------------------\n";
-    std::cout << title << " (" << count << " records)\n";
-    std::cout << "------------------------------------------------------------";
-    printSortTable(stats, 6);
+    printSortTable(stats, 6, title, count);
 }
 
 inline void sortingAnalysisMenu(const Patient facilityA[], int countA,
