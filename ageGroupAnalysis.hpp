@@ -51,32 +51,20 @@ struct AgeGroupStats {
     double sumAge     = 0.0;
     double sumStay    = 0.0;
     double totalCost  = 0.0;
-    std::string careTypes[20];
-    int         careCounts[20] = {0};
-    int         careTypeCount  = 0;
+    int    careCounts[MAX_CARE_TYPES] = {0};   // indexed by careTypeRegistry()
 };
 
-inline void addCareType(AgeGroupStats& s, const std::string& care) {
-    for (int i = 0; i < s.careTypeCount; i++) {
-        if (s.careTypes[i] == care) {
-            s.careCounts[i]++;
-            return;
+// Most common care type in the group; ties go to the care type registered first.
+inline std::string getTopCareType(const AgeGroupStats& s) {
+    const CareTypeRegistry& reg = careTypeRegistry();
+    int best = -1;
+    for (int c = 0; c < reg.count; c++) {
+        if (s.careCounts[c] > 0 && (best < 0 || s.careCounts[c] > s.careCounts[best])) {
+            best = c;
         }
     }
-    if (s.careTypeCount < 20) {
-        s.careTypes[s.careTypeCount]  = care;
-        s.careCounts[s.careTypeCount] = 1;
-        s.careTypeCount++;
-    }
-}
-
-inline std::string getTopCareType(const AgeGroupStats& s) {
-    if (s.careTypeCount == 0) return "-";
-    int best = 0;
-    for (int i = 1; i < s.careTypeCount; i++) {
-        if (s.careCounts[i] > s.careCounts[best]) best = i;
-    }
-    return s.careTypes[best] + " (" + std::to_string(s.careCounts[best]) + ")";
+    if (best < 0) return "-";
+    return reg.names[best] + " (" + std::to_string(s.careCounts[best]) + ")";
 }
 
 inline void collectAgeGroupStats(const Patient patients[], int count, AgeGroupStats stats[]) {
@@ -95,7 +83,9 @@ inline void collectAgeGroupStats(const Patient patients[], int count, AgeGroupSt
                     * patients[i].baseCostPerHour
                     * patients[i].daysVisitsPerYear;
         s.totalCost += cost;
-        addCareType(s, patients[i].careType);
+
+        int c = careTypeRegistry().indexOf(patients[i].careType);
+        if (c >= 0) s.careCounts[c]++;
     }
 }
 
@@ -106,55 +96,40 @@ inline void printAgeGroupReport(const Patient patients[], int count, const std::
     double grandTotalCost = 0.0;
     for (int i = 0; i < NUM_AGE_GROUPS; i++) grandTotalCost += stats[i].totalCost;
 
-    std::cout << "\n";
-    std::cout << title << "  - by age group  (" << count << " patients)\n";
-    std::cout << std::left
-              << std::setw(22) << "AgeGroup"
-              << std::setw(10) << "Patients"
+    std::cout << "\n" << title << "  -  by age group   (" << count << " patients)\n";
+    std::cout << std::left  << std::setw(21) << "AgeGroup"
+              << std::right << std::setw(9)  << "Patients"
               << std::setw(8)  << "Share"
               << std::setw(8)  << "AvgAge"
-              << std::setw(18) << "TopCareType"
-              << std::setw(10) << "AvgStay"
-              << std::setw(14) << "TotalCost(RM)"
-              << std::setw(12) << "AvgCost(RM)"
-              << "\n";
-    std::cout << std::string(100, '-') << "\n";
-
-    std::cout << std::fixed;
+              << "  " << std::left << std::setw(24) << "TopCareType"
+              << std::right << std::setw(9)  << "AvgStay"
+              << std::setw(16) << "TotalCost(RM)"
+              << std::setw(14) << "AvgCost(RM)" << "\n";
+    std::cout << std::string(109, '-') << "\n";
 
     for (int i = 0; i < NUM_AGE_GROUPS; i++) {
         const AgeGroupStats& s = stats[i];
-        double share   = (count > 0) ? (s.count * 100.0 / count) : 0.0;
-        double avgAge  = (s.count > 0) ? (s.sumAge  / s.count) : 0.0;
-        double avgStay = (s.count > 0) ? (s.sumStay / s.count) : 0.0;
-        double avgCost = (s.count > 0) ? (s.totalCost / s.count) : 0.0;
+        const int n = s.count;
 
-        std::ostringstream shareStr;
-        shareStr << std::fixed << std::setprecision(1) << share << "%";
-
-        std::cout << std::left << std::setw(22) << getAgeGroupName(i)
-                  << std::setw(10) << s.count
-                  << std::setw(8)  << shareStr.str()
-                  << std::setprecision(1) << std::setw(8) << avgAge
-                  << std::setw(18) << getTopCareType(s)
-                  << std::setw(10) << avgStay
-                  << std::right << std::setw(13) << std::setprecision(2) << s.totalCost
-                  << "  " << std::left << std::setprecision(2) << avgCost
-                  << "\n";
+        std::cout << std::left  << std::setw(21) << getAgeGroupName(i)
+                  << std::right << std::setw(9) << n
+                  << std::fixed << std::setprecision(1)
+                  << std::setw(7) << (count > 0 ? 100.0 * n / count : 0.0) << "%"
+                  << std::setw(8) << (n > 0 ? s.sumAge / n : 0.0)
+                  << "  " << std::left << std::setw(24) << getTopCareType(s)
+                  << std::right << std::setprecision(1)
+                  << std::setw(9) << (n > 0 ? s.sumStay / n : 0.0)
+                  << std::setprecision(2)
+                  << std::setw(16) << s.totalCost
+                  << std::setw(14) << (n > 0 ? s.totalCost / n : 0.0) << "\n";
     }
-
-    std::cout << std::string(100, '-') << "\n";
-    double overallAvgCost = (count > 0) ? (grandTotalCost / count) : 0.0;
-    std::cout << std::left << std::setw(22) << "TOTAL"
-              << std::setw(10) << count
-              << std::setw(8)  << ""
-              << std::setw(8)  << ""
-              << std::setw(18) << ""
-              << std::setw(10) << ""
-              << std::right << std::setw(13) << std::setprecision(2) << grandTotalCost
-              << "  " << std::left << std::setprecision(2) << overallAvgCost
+    std::cout << std::string(109, '-') << "\n";
+    std::cout << std::left  << std::setw(21) << "TOTAL"
+              << std::right << std::setw(9) << count
+              << std::fixed << std::setprecision(2)
+              << std::setw(67) << grandTotalCost
+              << std::setw(14) << (count > 0 ? grandTotalCost / count : 0.0)
               << "\n";
-    std::cout << "\n";
 }
 
 inline void ageGroupAnalysisMenu(const Patient facilityA[], int countA,

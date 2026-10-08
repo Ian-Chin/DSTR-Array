@@ -7,42 +7,58 @@
 #include "patient.hpp"
 
 inline void printCareTypeReport(const Patient patients[], int count, const std::string& title) {
-    std::string line(60, '=');
-    std::cout << "\n" << line << "\n";
-    std::cout << "               " << title << " CARE TYPE ANALYSIS REPORT\n";
-    std::cout << line << "\n";
-
-    std::string types[20];
-    int counts[20] = {0};
-    double totalHours[20] = {0.0};
-    int typeCount = 0;
+    // Indexed by careTypeRegistry(), so rows come out in the same order as the linked list version
+    int counts[MAX_CARE_TYPES] = {0};
+    double totalHours[MAX_CARE_TYPES] = {0.0};
+    double totalCost[MAX_CARE_TYPES] = {0.0};
+    double grandStay = 0.0;
+    double grandCost = 0.0;
+    CareTypeRegistry& reg = careTypeRegistry();
 
     for (int i = 0; i < count; i++) {
-        bool found = false;
-        for (int j = 0; j < typeCount; j++) {
-            if (types[j] == patients[i].careType) {
-                counts[j]++;
-                totalHours[j] += patients[i].lengthOfStay;
-                found = true;
-                break;
-            }
-        }
-        if (!found && typeCount < 20) {
-            types[typeCount] = patients[i].careType;
-            counts[typeCount] = 1;
-            totalHours[typeCount] = patients[i].lengthOfStay;
-            typeCount++;
+        double cost = patients[i].lengthOfStay * patients[i].baseCostPerHour * patients[i].daysVisitsPerYear;
+        grandStay += patients[i].lengthOfStay;
+        grandCost += cost;
+
+        int c = reg.indexOf(patients[i].careType);
+        if (c >= 0) {
+            counts[c]++;
+            totalHours[c] += patients[i].lengthOfStay;
+            totalCost[c] += cost;
         }
     }
 
-    std::cout << std::left << std::setw(20) << "Care Type" << std::setw(18) << "Patient Count" << "Total Stay Hours" << std::endl;
-    std::cout << std::string(60, '-') << std::endl;
-    for (int i = 0; i < typeCount; i++) {
-        std::cout << std::left << std::setw(20) << types[i] 
-                  << std::setw(18) << counts[i] 
-                  << std::fixed << std::setprecision(2) << totalHours[i] << " hrs" << std::endl;
+    std::cout << "\n" << title << "  -  by care type\n";
+    std::cout << std::left  << std::setw(18) << "CareType"
+              << std::right << std::setw(9)  << "Patients"
+              << std::setw(9)  << "AvgStay"
+              << std::setw(16) << "TotalCost(RM)"
+              << std::setw(14) << "AvgCost(RM)"
+              << std::setw(11) << "ShareCost" << "\n";
+    std::cout << std::string(77, '-') << "\n";
+
+    for (int i = 0; i < reg.count; i++) {
+        if (counts[i] == 0) continue;
+        std::cout << std::left  << std::setw(18) << reg.names[i]
+                  << std::right << std::setw(9) << counts[i]
+                  << std::fixed << std::setprecision(1)
+                  << std::setw(9) << totalHours[i] / counts[i]
+                  << std::setprecision(2)
+                  << std::setw(16) << totalCost[i]
+                  << std::setw(14) << totalCost[i] / counts[i]
+                  << std::setprecision(1)
+                  << std::setw(10) << (grandCost > 0.0 ? 100.0 * totalCost[i] / grandCost : 0.0)
+                  << "%" << "\n";
     }
-    std::cout << line << "\n";
+    std::cout << std::string(77, '-') << "\n";
+    std::cout << std::left  << std::setw(18) << "TOTAL"
+              << std::right << std::setw(9) << count
+              << std::fixed << std::setprecision(1)
+              << std::setw(9) << (count > 0 ? grandStay / count : 0.0)
+              << std::setprecision(2)
+              << std::setw(16) << grandCost
+              << std::setw(14) << (count > 0 ? grandCost / count : 0.0)
+              << std::setprecision(1) << std::setw(10) << 100.0 << "%\n";
 }
 
 inline void careTypeAnalysisMenu(const Patient facilityA[], int countA,

@@ -7,6 +7,7 @@
 
 #include "patient.hpp"
 #include "Sortinganalysis.hpp"
+#include "ageGroupAnalysis.hpp"
 
 struct SearchCriteria {
     bool        useAgeRange;
@@ -34,7 +35,8 @@ struct SearchStats {
     long   comparisons;
     double timeMs;
     int    matches;
-    long   extraBytes;   
+    long   extraBytes;
+    long   nodeHops = 0;   // next-pointer steps; always 0 for arrays (direct indexing)
 };
 
 typedef std::chrono::high_resolution_clock SearchClock;
@@ -139,38 +141,44 @@ inline void printSearchTable(const SearchStats stats[], int count) {
               << std::right << std::setw(13) << "Comparisons"
               << std::setw(12) << "Time(ms)"
               << std::setw(10) << "Matches"
-              << std::setw(14) << "ExtraMem(B)" << "\n";
-    std::cout << std::string(73, '-') << "\n";
+              << std::setw(14) << "ExtraMem(B)"
+              << std::setw(11) << "NodeHops" << "\n";
+    std::cout << std::string(84, '-') << "\n";
     for (int i = 0; i < count; i++) {
         std::cout << std::left  << std::setw(24) << stats[i].label
                   << std::right << std::setw(13) << stats[i].comparisons
                   << std::fixed << std::setprecision(5)
                   << std::setw(12) << stats[i].timeMs
                   << std::setw(10) << stats[i].matches
-                  << std::setw(14) << stats[i].extraBytes << "\n";
+                  << std::setw(14) << stats[i].extraBytes
+                  << std::setw(11) << stats[i].nodeHops << "\n";
     }
 }
 
 inline void printMatchRows(const Patient rows[], int count, int maxRows) {
     std::cout << std::left
-              << std::setw(12) << "Patient ID"
-              << std::setw(8)  << "Age"
-              << std::setw(20) << "Care Type"
-              << std::setw(12) << "Stay(hr)"
-              << std::setw(12) << "Cost/hr"
-              << std::setw(12) << "Visits/Year"
-              << std::setw(14) << "Total Cost" << "\n";
-    std::cout << std::string(90, '-') << "\n";
+              << std::setw(10) << "PatientID"
+              << std::setw(5)  << "Age"
+              << std::setw(21) << "AgeGroup"
+              << std::setw(18) << "CareType"
+              << std::right
+              << std::setw(7)  << "Hours"
+              << std::setw(9)  << "Rate"
+              << std::setw(8)  << "Visits"
+              << std::setw(14) << "Cost(RM)" << "\n";
+    std::cout << std::string(92, '-') << "\n";
 
     for (int i = 0; i < count && i < maxRows; i++) {
         std::cout << std::left
-                  << std::setw(12) << rows[i].patientID
-                  << std::setw(8)  << rows[i].age
-                  << std::setw(20) << rows[i].careType
-                  << std::fixed << std::setprecision(2)
-                  << std::setw(12) << rows[i].lengthOfStay
-                  << std::setw(12) << rows[i].baseCostPerHour
-                  << std::setw(12) << rows[i].daysVisitsPerYear
+                  << std::setw(10) << rows[i].patientID
+                  << std::setw(5)  << rows[i].age
+                  << std::setw(21) << getAgeGroupName(getAgeGroupIndex(rows[i].age))
+                  << std::setw(18) << rows[i].careType
+                  << std::right << std::fixed << std::setprecision(0)
+                  << std::setw(7)  << rows[i].lengthOfStay
+                  << std::setprecision(2)
+                  << std::setw(9)  << rows[i].baseCostPerHour
+                  << std::setw(8)  << rows[i].daysVisitsPerYear
                   << std::setw(14) << getMedicalCost(rows[i]) << "\n";
     }
     if (count > maxRows) {
@@ -201,7 +209,7 @@ inline void runSearchExperiment(const Patient patients[], int count, const std::
     a[1] = rangeSearchSortedByAge(sorted, count, critA, resultsSorted);
     int hit = binarySearchByKey(sorted, count, ageOf, 65.0, a[2]);
 
-    std::cout << "\nQuery A: Age 61-100 + Care Type = Emergency\n";
+    std::cout << "\nSenior Emergency Patients: Age 61-100 + Care Type = Emergency\n";
     printSearchTable(a, 3);
     std::cout << "\nMatching records (linear search result):\n";
     printMatchRows(results, matchesA, 10);
@@ -220,7 +228,7 @@ inline void runSearchExperiment(const Patient patients[], int count, const std::
     mergeSort(sorted, count, byStayAsc, cmp, mv);
     int first = binaryFirstGreater(sorted, count, stayOf, 24.0, b[1]);
 
-    std::cout << "\nQuery B: Length of Stay > 24 hours\n";
+    std::cout << "\nLong Stay Patients: Visit Duration > 24 hours\n";
     printSearchTable(b, 2);
     std::cout << "\nMatching records (linear search result):\n";
     printMatchRows(results, matchesB, 10);
