@@ -61,14 +61,4 @@ inline void printCareTypeReport(const Patient patients[], int count, const std::
               << std::setprecision(1) << std::setw(10) << 100.0 << "%\n";
 }
 
-inline void careTypeAnalysisMenu(const Patient facilityA[], int countA,
-                                 const Patient facilityB[], int countB,
-                                 const Patient facilityC[], int countC,
-                                 const Patient combined[], int combinedCount) {
-    printCareTypeReport(facilityA, countA, "FACILITY A");
-    printCareTypeReport(facilityB, countB, "FACILITY B");
-    printCareTypeReport(facilityC, countC, "FACILITY C");
-    printCareTypeReport(combined, combinedCount, "OVERALL");
-}
-
 #endif

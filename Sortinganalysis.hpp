@@ -140,15 +140,4 @@ inline void runSortingExperiment(const Patient patients[], int count, const std:
     printSortTable(stats, 6, title, count);
 }
 
-inline void sortingAnalysisMenu(const Patient facilityA[], int countA,
-                                const Patient facilityB[], int countB,
-                                const Patient facilityC[], int countC,
-                                const Patient combined[], int combinedCount) {
-    std::cout << "\n=== SORTING (ARRAY) ===\n";
-    runSortingExperiment(facilityA, countA, "FACILITY A");
-    runSortingExperiment(facilityB, countB, "FACILITY B");
-    runSortingExperiment(facilityC, countC, "FACILITY C");
-    runSortingExperiment(combined, combinedCount, "COMBINED (A + B + C)");
-}
-
 #endif

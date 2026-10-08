@@ -240,15 +240,4 @@ inline void runSearchExperiment(const Patient patients[], int count, const std::
     delete[] results;
 }
 
-inline void searchAnalysisMenu(const Patient facilityA[], int countA,
-                               const Patient facilityB[], int countB,
-                               const Patient facilityC[], int countC,
-                               const Patient combined[], int combinedCount) {
-    std::cout << "\n=== SEARCHING (ARRAY) ===\n";
-    runSearchExperiment(facilityA, countA, "FACILITY A");
-    runSearchExperiment(facilityB, countB, "FACILITY B");
-    runSearchExperiment(facilityC, countC, "FACILITY C");
-    runSearchExperiment(combined, combinedCount, "COMBINED (A + B + C)");
-}
-
 #endif

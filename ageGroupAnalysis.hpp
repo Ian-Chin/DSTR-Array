@@ -4,8 +4,6 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
-#include <cmath>
-#include <sstream>
 #include "patient.hpp"
 
 const int NUM_AGE_GROUPS = 5;
@@ -28,22 +26,6 @@ inline int getAgeGroupIndex(int age) {
     if (age >= 46 && age <= 60)  return 3;   // 46-60 Working Late
     if (age >= 61)               return 4;   // 61-100 Senior
     return -1;
-}
-
-inline int countAgeGroups(const Patient patients[], int count, int ageCounts[]) {
-    for (int i = 0; i < NUM_AGE_GROUPS; i++) {
-        ageCounts[i] = 0;
-    }
-    int outOfRange = 0;
-    for (int i = 0; i < count; i++) {
-        int idx = getAgeGroupIndex(patients[i].age);
-        if (idx >= 0 && idx < NUM_AGE_GROUPS) {
-            ageCounts[idx]++;
-        } else {
-            outOfRange++;
-        }
-    }
-    return outOfRange;
 }
 
 struct AgeGroupStats {
@@ -130,16 +112,6 @@ inline void printAgeGroupReport(const Patient patients[], int count, const std::
               << std::setw(67) << grandTotalCost
               << std::setw(14) << (count > 0 ? grandTotalCost / count : 0.0)
               << "\n";
-}
-
-inline void ageGroupAnalysisMenu(const Patient facilityA[], int countA,
-                                 const Patient facilityB[], int countB,
-                                 const Patient facilityC[], int countC,
-                                 const Patient combined[], int combinedCount) {
-    printAgeGroupReport(facilityA, countA, "Dataset 1 - Facility A");
-    printAgeGroupReport(facilityB, countB, "Dataset 2 - Facility B");
-    printAgeGroupReport(facilityC, countC, "Dataset 3 - Facility C");
-    printAgeGroupReport(combined, combinedCount, "OVERALL");
 }
 
 #endif
