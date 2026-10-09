@@ -29,14 +29,13 @@ inline bool matchesCriteria(const Patient& p, const SearchCriteria& c) {
     return true;
 }
 
-// Results of one search run
 struct SearchStats {
     std::string label;
     long   comparisons;
     double timeMs;
     int    matches;
     long   extraBytes;
-    long   nodeHops = 0;   // next-pointer steps; always 0 for arrays (direct indexing)
+    long   nodeHops = 0;
 };
 
 typedef std::chrono::high_resolution_clock SearchClock;

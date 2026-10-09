@@ -3,7 +3,7 @@
 
 #include <string>
 
-const int MAX_PATIENTS = 350; // Maximum capacity for raw arrays per facility
+const int MAX_PATIENTS = 350;
 
 struct Patient {
     std::string patientID;
@@ -16,13 +16,10 @@ struct Patient {
 
 const int MAX_CARE_TYPES = 16;
 
-// Care types in the order they are first seen while loading (dataset 1, 2, 3).
-// Reports list care types in this order, the same as the linked list version.
 struct CareTypeRegistry {
     std::string names[MAX_CARE_TYPES];
     int count = 0;
 
-    // Returns the care type's index, registering it if it is new (-1 when full).
     int indexOf(const std::string& name) {
         for (int i = 0; i < count; i++) {
             if (names[i] == name) return i;

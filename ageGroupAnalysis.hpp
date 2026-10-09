@@ -20,11 +20,11 @@ inline std::string getAgeGroupName(int index) {
 }
 
 inline int getAgeGroupIndex(int age) {
-    if (age >= 0  && age <= 17)  return 0;   // 0-17 Pediatrics
-    if (age >= 18 && age <= 25)  return 1;   // 18-25 Young Adult
-    if (age >= 26 && age <= 45)  return 2;   // 26-45 Working Early
-    if (age >= 46 && age <= 60)  return 3;   // 46-60 Working Late
-    if (age >= 61)               return 4;   // 61-100 Senior
+    if (age >= 0  && age <= 17)  return 0;
+    if (age >= 18 && age <= 25)  return 1;
+    if (age >= 26 && age <= 45)  return 2;
+    if (age >= 46 && age <= 60)  return 3;
+    if (age >= 61)               return 4;
     return -1;
 }
 
@@ -33,10 +33,9 @@ struct AgeGroupStats {
     double sumAge     = 0.0;
     double sumStay    = 0.0;
     double totalCost  = 0.0;
-    int    careCounts[MAX_CARE_TYPES] = {0};   // indexed by careTypeRegistry()
+    int    careCounts[MAX_CARE_TYPES] = {0};
 };
 
-// Most common care type in the group; ties go to the care type registered first.
 inline std::string getTopCareType(const AgeGroupStats& s) {
     const CareTypeRegistry& reg = careTypeRegistry();
     int best = -1;

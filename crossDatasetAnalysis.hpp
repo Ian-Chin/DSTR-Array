@@ -8,7 +8,6 @@
 #include "patient.hpp"
 #include "ageGroupAnalysis.hpp"
 
-// Per-dataset totals used by the cross-dataset comparison tables.
 struct DatasetTotals {
     int    patients    = 0;
     double totalAge    = 0.0;
@@ -73,7 +72,6 @@ inline void printDatasetComparison(const DatasetTotals t[], const std::string la
     }
 }
 
-// costMode = true: total cost per age group; false: average length of stay.
 inline void printCrossMatrix(const DatasetTotals t[], const std::string labels[], int count,
                              const DatasetTotals& combined, bool costMode) {
     const int width = 21 + 16 * (count + 1);

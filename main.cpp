@@ -46,7 +46,6 @@ static int readInt(const string& prompt, int lo, int hi, int onEOF) {
     return onEOF;
 }
 
-// Wipe the console so each menu and result starts on a fresh screen.
 static void clearScreen() {
 #ifdef _WIN32
     system("cls");
@@ -61,7 +60,6 @@ static void pause() {
     getline(cin, ignored);
 }
 
-// Splits one CSV line into exactly `expected` trimmed fields.
 static bool splitCSV(const string& line, string out[], int expected) {
     stringstream ss(line);
     string field;
@@ -75,7 +73,6 @@ static bool splitCSV(const string& line, string out[], int expected) {
     return !getline(ss, field);
 }
 
-// Same validation rules as the linked list loader, so both load the same records.
 bool loadDataset(const string& filename, Patient patients[], int& count) {
     ifstream file(filename);
     if (!file.is_open()) {
@@ -88,7 +85,7 @@ bool loadDataset(const string& filename, Patient patients[], int& count) {
     string field[COLS];
     count = 0;
 
-    if (!getline(file, line)) {   // header
+    if (!getline(file, line)) {
         cerr << "ERROR: \"" << filename << "\" is empty\n";
         return false;
     }
@@ -103,7 +100,7 @@ bool loadDataset(const string& filename, Patient patients[], int& count) {
         p.careType  = field[2];
         try {
             p.age               = stoi(field[1]);
-            p.lengthOfStay      = stoi(field[3]);   // whole hours, as in the linked list version
+            p.lengthOfStay      = stoi(field[3]);
             p.baseCostPerHour   = stod(field[4]);
             p.daysVisitsPerYear = stoi(field[5]);
         } catch (...) {
@@ -205,7 +202,6 @@ int main() {
         "Dataset 1", "Dataset 2", "Dataset 3"
     };
 
-    // static: keeps ~1400 Patient records off the stack
     static Patient facilityA[MAX_PATIENTS], facilityB[MAX_PATIENTS], facilityC[MAX_PATIENTS];
     static Patient combined[MAX_PATIENTS * DATASET_COUNT];
     Patient* lists[LIST_COUNT] = { facilityA, facilityB, facilityC, combined };

@@ -7,7 +7,6 @@
 #include "patient.hpp"
 
 inline void printCareTypeReport(const Patient patients[], int count, const std::string& title) {
-    // Indexed by careTypeRegistry(), so rows come out in the same order as the linked list version
     int counts[MAX_CARE_TYPES] = {0};
     double totalHours[MAX_CARE_TYPES] = {0.0};
     double totalCost[MAX_CARE_TYPES] = {0.0};
